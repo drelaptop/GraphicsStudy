@@ -15,7 +15,7 @@ var FSHADER_SOURCE =
     'gl_FragColor = u_FragColor;\n' +
     '}\n';
 
-function myDrawPoint(gl, canvas) {
+function myDrawMultiPoint(gl) {
     var a_PositionInJS = gl.getAttribLocation(gl.program, 'a_Position');
     var a_PointSizeInJS = gl.getAttribLocation(gl.program, 'a_PointSize');
     var u_FragColorInJS = gl.getUniformLocation(gl.program, 'u_FragColor');
@@ -27,31 +27,25 @@ function myDrawPoint(gl, canvas) {
         console.log('Failed to getUniformLocation');
         return;
     }
-    //mouse click
-    canvas.onmousedown = function(ev) {
-        click(ev, gl, canvas, a_PositionInJS, a_PointSizeInJS, u_FragColorInJS);
-    };
+    gl.vertexAttrib1f(a_PointSizeInJS, 10);
+    gl.uniform4f(u_FragColorInJS, 1.0, 0.0, 0.0, 1.0);
+    //multi push and draw
+    dealMultiPoint(gl, a_PositionInJS);
 }
 
-function click(ev, gl, canvas, a_PositionInJS, a_PointSizeInJS, u_FragColorInJS) {
-    var x = ev.clientX;
-    var y = ev.clientY;
-    var rect = ev.target.getBoundingClientRect();
-    x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
-    y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
-    g_points.push(x);
-    g_points.push(y);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    //show RGB values
-    console.log('RGB:' + x.toFixed(1) + ',' + y.toFixed(1) + ',' + (x * y).toFixed(1));
+function dealMultiPoint(gl, a_PositionInJS) {
+    g_points.push(0.5);
+    g_points.push(0.5);
+    g_points.push(0.5);
+    g_points.push(-0.5);
+    g_points.push(-0.5);
+    g_points.push(0.5);
+    g_points.push(-0.5);
+    g_points.push(-0.5);
 
     var len = g_points.length;
     for (var i = 0; i < len; i += 2) {
         gl.vertexAttrib3f(a_PositionInJS, g_points[i], g_points[i + 1], 0.0);
-        gl.vertexAttrib1f(a_PointSizeInJS, i > 10 ? 15 : i + 5);
-        //color RGBA
-        gl.uniform4f(u_FragColorInJS, g_points[i], g_points[i + 1], g_points[i] * g_points[i + 1], 1.0);
         gl.drawArrays(gl.POINTS, 0, 1);
     }
 }
@@ -69,8 +63,8 @@ function main() {
         return;
     }
     // set gray
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clearColor(0.9, 0.9, 0.9, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    myDrawPoint(gl, canvas);
+    myDrawMultiPoint(gl);
 }
