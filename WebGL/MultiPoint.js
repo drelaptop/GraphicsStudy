@@ -29,25 +29,30 @@ function myDrawMultiPoint(gl) {
     }
     gl.vertexAttrib1f(a_PointSizeInJS, 10);
     gl.uniform4f(u_FragColorInJS, 1.0, 0.0, 0.0, 1.0);
-    //multi push and draw
-    dealMultiPoint(gl, a_PositionInJS);
+    //buffer and draw
+    var num = initVertexBuffers(gl);
+    if (num < 0) {
+        console.log('Failed to initVertexBuffers');
+        return;
+    }
+    //skip s point
+    gl.drawArrays(gl.POINTS, 1, num - 1);
 }
 
-function dealMultiPoint(gl, a_PositionInJS) {
-    g_points.push(0.5);
-    g_points.push(0.5);
-    g_points.push(0.5);
-    g_points.push(-0.5);
-    g_points.push(-0.5);
-    g_points.push(0.5);
-    g_points.push(-0.5);
-    g_points.push(-0.5);
-
-    var len = g_points.length;
-    for (var i = 0; i < len; i += 2) {
-        gl.vertexAttrib3f(a_PositionInJS, g_points[i], g_points[i + 1], 0.0);
-        gl.drawArrays(gl.POINTS, 0, 1);
+function initVertexBuffers(gl, a_PositionInJS) {
+    var numForPoint = 2;
+    var vertices = new Float32Array([0.0, 0.0, 0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+    var vertexBuffer = gl.createBuffer();
+    if (!vertexBuffer) {
+        console.log('Failed to createBuffer');
+        return -1;
     }
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_PositionInJS, numForPoint, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_PositionInJS);
+
+    return vertices.length / numForPoint;
 }
 
 function main() {
