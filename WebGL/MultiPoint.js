@@ -1,6 +1,4 @@
-var g_points = [];
-
-var VSHADER_SOURCE =
+let VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
     'attribute float a_PointSize;\n' +
     'void main(){\n' +
@@ -8,7 +6,7 @@ var VSHADER_SOURCE =
     'gl_PointSize = a_PointSize;\n' +
     '}\n';
 
-var FSHADER_SOURCE =
+let FSHADER_SOURCE =
     'precision mediump float;\n' +
     'uniform vec4 u_FragColor;\n' +
     'void main(){\n' +
@@ -16,53 +14,53 @@ var FSHADER_SOURCE =
     '}\n';
 
 function myDrawMultiPoint(gl) {
-    var a_PositionInJS = gl.getAttribLocation(gl.program, 'a_Position');
-    var a_PointSizeInJS = gl.getAttribLocation(gl.program, 'a_PointSize');
-    var u_FragColorInJS = gl.getUniformLocation(gl.program, 'u_FragColor');
-    if (a_PositionInJS < 0 || a_PointSizeInJS < 0) {
+    let aPositionInJS = gl.getAttribLocation(gl.program, 'a_Position');
+    let aPointSizeInJS = gl.getAttribLocation(gl.program, 'a_PointSize');
+    let uFragColorInJS = gl.getUniformLocation(gl.program, 'u_FragColor');
+    if (aPositionInJS < 0 || aPointSizeInJS < 0) {
         console.log('Failed to getAttribLocation');
         return;
     }
-    if (!u_FragColorInJS) {
+    if (!uFragColorInJS) {
         console.log('Failed to getUniformLocation');
         return;
     }
-    gl.vertexAttrib1f(a_PointSizeInJS, 10);
-    gl.uniform4f(u_FragColorInJS, 1.0, 0.0, 0.0, 1.0);
-    //buffer and draw
-    var num = initVertexBuffers(gl);
+    gl.vertexAttrib1f(aPointSizeInJS, 10);
+    gl.uniform4f(uFragColorInJS, 1.0, 0.0, 0.0, 1.0);
+    // buffer and draw
+    let num = initVertexBuffers(gl);
     if (num < 0) {
         console.log('Failed to initVertexBuffers');
         return;
     }
-    //skip s point
+    // skip s point
     gl.drawArrays(gl.POINTS, 1, num - 1);
 }
 
-function initVertexBuffers(gl, a_PositionInJS) {
-    var numForPoint = 2;
-    var vertices = new Float32Array([0.0, 0.0, 0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
-    var vertexBuffer = gl.createBuffer();
+function initVertexBuffers(gl, aPositionInJS) {
+    let numForPoint = 2;
+    let vertices = new Float32Array([0.0, 0.0, 0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+    let vertexBuffer = gl.createBuffer();
     if (!vertexBuffer) {
         console.log('Failed to createBuffer');
         return -1;
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(a_PositionInJS, numForPoint, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(a_PositionInJS);
+    gl.vertexAttribPointer(aPositionInJS, numForPoint, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(aPositionInJS);
 
     return vertices.length / numForPoint;
 }
 
 function main() {
-    var canvas = document.getElementById("glcanvas");
-    var gl = getWebGLContext(canvas);
+    let canvas = document.getElementById('glcanvas');
+    let gl = getWebGLContext(canvas);
     if (!gl) {
-        console.log("initWebGL Failed");
+        console.log('initWebGL Failed');
         return;
     }
-    //init shaders
+    // init shaders
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
         console.log('Failed initShaders');
         return;
