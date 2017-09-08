@@ -2,9 +2,9 @@ var g_points = [];
 
 var VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
-    'uniform vec4 u_Translation;\n' +
+    'uniform mat4 u_Matrix;\n' +
     'void main(){\n' +
-    'gl_Position = a_Position + u_Translation;\n' +
+    'gl_Position =  u_Matrix * a_Position;\n' +
     '}\n';
 
 var FSHADER_SOURCE =
@@ -17,7 +17,7 @@ var FSHADER_SOURCE =
 function myDrawTriangle(gl) {
     var a_PositionInJS = gl.getAttribLocation(gl.program, 'a_Position');
     var u_FragColorInJS = gl.getUniformLocation(gl.program, 'u_FragColor');
-    var u_TranslationInJS = gl.getUniformLocation(gl.program, 'u_Translation');
+    var u_MatrixInJS = gl.getUniformLocation(gl.program, 'u_Matrix');
     if (a_PositionInJS < 0) {
         console.log('Failed to getAttribLocation');
         return;
@@ -28,7 +28,18 @@ function myDrawTriangle(gl) {
     }
     gl.uniform4f(u_FragColorInJS, 1.0, 0.0, 0.0, 1.0);
     //add trans vector data
-    gl.uniform4f(u_TranslationInJS, -0.5, 0.5, 0.0, 0.0);
+    var angle = 45.0;
+    var radian = Math.PI * angle / 180.0;
+    var cosB = Math.cos(radian);
+    var sinB = Math.sin(radian);
+    var u_MatrixPrepare = new Float32Array([
+        cosB, sinB, 0.0, 0.0, 
+        -sinB, cosB, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    ]);
+    gl.uniformMatrix4fv(u_MatrixInJS, false, u_MatrixPrepare);
+
     //buffer and draw
     var num = initVertexBuffers(gl);
     if (num < 0) {
