@@ -26,13 +26,14 @@ function myDrawTriangle(gl) {
     }
     gl.uniform4f(uFragColorInJS, 1.0, 0.0, 0.0, 1.0);
     // add trans vector data
-    let angle = 45.0;
+    let angle = 180.0;
     let radian = Math.PI * angle / 180.0;
     let cosB = Math.cos(radian);
     let sinB = Math.sin(radian);
+    // Note: WebGL is column major order
     let uMatrixPrepare = new Float32Array([
-        cosB, sinB, 0.0, 0.0,
-        -sinB, cosB, 0.0, 0.0,
+        2 * cosB, 2 * sinB, 0.0, 0.0,
+        -2 * sinB, 2 * cosB, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0,
     ]);
