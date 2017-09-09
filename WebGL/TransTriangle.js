@@ -25,19 +25,11 @@ function myDrawTriangle(gl) {
         return;
     }
     gl.uniform4f(uFragColorInJS, 1.0, 0.0, 0.0, 1.0);
-    // add trans vector data
-    let angle = 180.0;
-    let radian = Math.PI * angle / 180.0;
-    let cosB = Math.cos(radian);
-    let sinB = Math.sin(radian);
-    // Note: WebGL is column major order
-    let uMatrixPrepare = new Float32Array([
-        2 * cosB, 2 * sinB, 0.0, 0.0,
-        -2 * sinB, 2 * cosB, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        0.0, 0.0, 0.0, 1.0,
-    ]);
-    gl.uniformMatrix4fv(uMatrixInJS, false, uMatrixPrepare);
+
+    let angle = 90.0;
+    let uMatrixPrepare = new Matrix4();
+    uMatrixPrepare.setRotate(angle, 0, 0, 1);
+    gl.uniformMatrix4fv(uMatrixInJS, false, uMatrixPrepare.elements);
 
     // buffer and draw
     let num = initVertexBuffers(gl);
