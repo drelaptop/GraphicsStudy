@@ -10,7 +10,7 @@ module.exports = {
         "require-jsdoc": 0,
         "max-len": ["error", 120, 4],
         "camelcase": "warn",
-        "linebreak-style": "error",
+        "linebreak-style": 0,
         "no-var": "error"
     }
 };
