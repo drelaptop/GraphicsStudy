@@ -26,9 +26,11 @@ function myDrawTriangle(gl) {
     }
     gl.uniform4f(uFragColorInJS, 1.0, 0.0, 0.0, 1.0);
 
-    let angle = 90.0;
     let uMatrixPrepare = new Matrix4();
-    uMatrixPrepare.setRotate(angle, 0, 0, 1);
+    uMatrixPrepare.setScale(1.5, 1.5, 0.0);
+    uMatrixPrepare.rotate(45.0, 0.0, 0.0, 1.0);
+    uMatrixPrepare.translate(0.0, 0.2, 0.0);
+    // change:fisrt translate, and rotate, and then scale.
     gl.uniformMatrix4fv(uMatrixInJS, false, uMatrixPrepare.elements);
 
     // buffer and draw
