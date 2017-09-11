@@ -30,16 +30,17 @@ function myDrawTriangle(gl) {
         return;
     }
 
-    gl.clear(gl.COLOR_BUFFER_BIT);    
-    gl.drawArrays(gl.POINTS, 0, num);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, num);
 }
 
 function initVertexBuffers(gl, aPositionInJS, aColorInJS) {
     let numForPoint = 5;
     let vertices = new Float32Array([
         -0.5, -0.5, 1.0, 0.0, 0.0,
-        0.0, 0.5, 0.0, 1.0, 0.0,
         0.5, -0.5, 0.0, 0.0, 1.0,
+        0.5, 0.5, 0.0, 1.0, 0.0,
+        -0.5, 0.5, 1.0, 1.0, 1.0,
     ]);
     let vertexBuffer = gl.createBuffer();
     if (!vertexBuffer) {
@@ -75,4 +76,3 @@ function main() {
 
     myDrawTriangle(gl);
 }
-
