@@ -1,51 +1,46 @@
 let VSHADER_SOURCE =
     'attribute vec4 a_Position;\n' +
-    'uniform mat4 u_Matrix;\n' +
+    'attribute vec4 a_Color;\n' +
+    'varying vec4 v_Color;\n' +
     'void main(){\n' +
-    'gl_Position =  u_Matrix * a_Position;\n' +
+    'gl_Position = a_Position;\n' +
+    'gl_PointSize = 10.0;\n' +
+    'v_Color = a_Color;\n' +
     '}\n';
 
 let FSHADER_SOURCE =
     'precision mediump float;\n' +
-    'uniform vec4 u_FragColor;\n' +
+    'varying vec4 v_Color;\n' +
     'void main(){\n' +
-    'gl_FragColor = u_FragColor;\n' +
+    'gl_FragColor = v_Color;\n' +
     '}\n';
 
 function myDrawTriangle(gl) {
     let aPositionInJS = gl.getAttribLocation(gl.program, 'a_Position');
-    let uFragColorInJS = gl.getUniformLocation(gl.program, 'u_FragColor');
-    let uMatrixInJS = gl.getUniformLocation(gl.program, 'u_Matrix');
-    if (aPositionInJS < 0) {
+    let aColorInJS = gl.getAttribLocation(gl.program, 'a_Color');
+    if (aPositionInJS < 0 || aColorInJS < 0) {
         console.log('Failed to getAttribLocation');
         return;
     }
-    if (!uFragColorInJS) {
-        console.log('Failed to getUniformLocation');
-        return;
-    }
-    gl.uniform4f(uFragColorInJS, 1.0, 0.0, 0.0, 1.0);
-
-    let uMatrixPrepare = new Matrix4();
-    uMatrixPrepare.setScale(1.5, 1.5, 0.0);
-    uMatrixPrepare.rotate(45.0, 0.0, 0.0, 1.0);
-    uMatrixPrepare.translate(0.0, 0.2, 0.0);
-    // change:fisrt translate, and rotate, and then scale.
-    gl.uniformMatrix4fv(uMatrixInJS, false, uMatrixPrepare.elements);
 
     // buffer and draw
-    let num = initVertexBuffers(gl);
+    let num = initVertexBuffers(gl, aPositionInJS, aColorInJS);
     if (num < 0) {
         console.log('Failed to initVertexBuffers');
         return;
     }
-    // skip s point
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, num);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);    
+    gl.drawArrays(gl.POINTS, 0, num);
 }
 
-function initVertexBuffers(gl, aPositionInJS) {
-    let numForPoint = 2;
-    let vertices = new Float32Array([-0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5]);
+function initVertexBuffers(gl, aPositionInJS, aColorInJS) {
+    let numForPoint = 5;
+    let vertices = new Float32Array([
+        -0.5, -0.5, 1.0, 0.0, 0.0,
+        0.0, 0.5, 0.0, 1.0, 0.0,
+        0.5, -0.5, 0.0, 0.0, 1.0,
+    ]);
     let vertexBuffer = gl.createBuffer();
     if (!vertexBuffer) {
         console.log('Failed to createBuffer');
@@ -53,8 +48,11 @@ function initVertexBuffers(gl, aPositionInJS) {
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(aPositionInJS, numForPoint, gl.FLOAT, false, 0, 0);
+    let eLength = vertices.BYTES_PER_ELEMENT;
+    gl.vertexAttribPointer(aPositionInJS, 2, gl.FLOAT, false, eLength * 5, 0);
+    gl.vertexAttribPointer(aColorInJS, 3, gl.FLOAT, false, eLength * 5, eLength * 2);
     gl.enableVertexAttribArray(aPositionInJS);
+    gl.enableVertexAttribArray(aColorInJS);
 
     return vertices.length / numForPoint;
 }
@@ -75,6 +73,6 @@ function main() {
     gl.clearColor(0.9, 0.9, 0.9, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-
     myDrawTriangle(gl);
 }
+
